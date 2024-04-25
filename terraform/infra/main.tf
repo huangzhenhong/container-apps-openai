@@ -75,32 +75,32 @@ module "acr_private_dns_zone" {
   }
 }
 
-module "openai_private_dns_zone" {
-  source                       = "./modules/private_dns_zone"
-  name                         = "privatelink.openai.azure.com"
-  resource_group_name          = azurerm_resource_group.rg.name
-  tags                         = var.tags
-  virtual_networks_to_link     = {
-    (module.virtual_network.name) = {
-      subscription_id = data.azurerm_client_config.current.subscription_id
-      resource_group_name = azurerm_resource_group.rg.name
-    }
-  }
-}
+# module "openai_private_dns_zone" {
+#   source                       = "./modules/private_dns_zone"
+#   name                         = "privatelink.openai.azure.com"
+#   resource_group_name          = azurerm_resource_group.rg.name
+#   tags                         = var.tags
+#   virtual_networks_to_link     = {
+#     (module.virtual_network.name) = {
+#       subscription_id = data.azurerm_client_config.current.subscription_id
+#       resource_group_name = azurerm_resource_group.rg.name
+#     }
+#   }
+# }
 
-module "openai_private_endpoint" {
-  source                         = "./modules/private_endpoint"
-  name                           = "${module.openai.name}PrivateEndpoint"
-  location                       = var.location
-  resource_group_name            = azurerm_resource_group.rg.name
-  subnet_id                      = module.virtual_network.subnet_ids[var.private_endpoint_subnet_name]
-  tags                           = var.tags
-  private_connection_resource_id = module.openai.id
-  is_manual_connection           = false
-  subresource_name               = "account"
-  private_dns_zone_group_name    = "OpenAiPrivateDnsZoneGroup"
-  private_dns_zone_group_ids     = [module.openai_private_dns_zone.id]
-}
+# module "openai_private_endpoint" {
+#   source                         = "./modules/private_endpoint"
+#   name                           = "${module.openai.name}PrivateEndpoint"
+#   location                       = var.location
+#   resource_group_name            = azurerm_resource_group.rg.name
+#   subnet_id                      = module.virtual_network.subnet_ids[var.private_endpoint_subnet_name]
+#   tags                           = var.tags
+#   private_connection_resource_id = module.openai.id
+#   is_manual_connection           = false
+#   subresource_name               = "account"
+#   private_dns_zone_group_name    = "OpenAiPrivateDnsZoneGroup"
+#   private_dns_zone_group_ids     = [module.openai_private_dns_zone.id]
+# }
 
 module "acr_private_endpoint" {
   source                         = "./modules/private_endpoint"
@@ -116,19 +116,19 @@ module "acr_private_endpoint" {
   private_dns_zone_group_ids     = [module.acr_private_dns_zone.id]
 }
 
-module "openai" {
-  source                        = "./modules/openai"
-  name                          = var.name_prefix == null ? "${random_string.prefix.result}${var.openai_name}" : "${var.name_prefix}${var.openai_name}"
-  location                      = var.location
-  resource_group_name           = azurerm_resource_group.rg.name
-  sku_name                      = var.openai_sku_name
-  tags                          = var.tags
-  deployments                   = var.openai_deployments
-  custom_subdomain_name         = var.openai_custom_subdomain_name == "" || var.openai_custom_subdomain_name == null ? var.name_prefix == null ? lower("${random_string.prefix.result}${var.openai_name}") : lower("${var.name_prefix}${var.openai_name}") : lower(var.openai_custom_subdomain_name)
-  public_network_access_enabled = var.openai_public_network_access_enabled
-  log_analytics_workspace_id    = module.log_analytics_workspace.id
-  log_analytics_retention_days  = var.log_analytics_retention_days
-}
+# module "openai" {
+#   source                        = "./modules/openai"
+#   name                          = var.name_prefix == null ? "${random_string.prefix.result}${var.openai_name}" : "${var.name_prefix}${var.openai_name}"
+#   location                      = var.location
+#   resource_group_name           = azurerm_resource_group.rg.name
+#   sku_name                      = var.openai_sku_name
+#   tags                          = var.tags
+#   deployments                   = var.openai_deployments
+#   custom_subdomain_name         = var.openai_custom_subdomain_name == "" || var.openai_custom_subdomain_name == null ? var.name_prefix == null ? lower("${random_string.prefix.result}${var.openai_name}") : lower("${var.name_prefix}${var.openai_name}") : lower(var.openai_custom_subdomain_name)
+#   public_network_access_enabled = var.openai_public_network_access_enabled
+#   log_analytics_workspace_id    = module.log_analytics_workspace.id
+#   log_analytics_retention_days  = var.log_analytics_retention_days
+# }
 
 module "container_registry" {
   source                       = "./modules/container_registry"

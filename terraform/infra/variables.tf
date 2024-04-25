@@ -93,7 +93,7 @@ variable "acr_name" {
 variable "acr_sku" {
   description = "Specifies the name of the container registry"
   type        = string
-  default     = "Premium"
+  default     = "Basic"
 
   validation {
     condition = contains(["Basic", "Standard", "Premium"], var.acr_sku)
